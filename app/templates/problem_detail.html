@@ -27,7 +27,38 @@
                 <br><strong>Output:</strong> {{ tc.output }}
             </div>
         {% endfor %}
-        
+
+        <hr>
+        <h4>🔍 Similarity Detection</h4>
+        <form method="post" action="/problems/{{ problem.id }}/similarity-check" style="display:inline;">
+            <button type="submit" class="btn btn-warning" onclick="return confirm('Run similarity check for this problem?')">Check Similarity</button>
+        </form>
+
+        {% if similarity_report %}
+            <div style="margin-top: 10px; background: #f0f8ff; padding: 10px; border-radius: 6px;">
+                <p><strong>Last Report:</strong> {{ similarity_report.total_submissions }} submissions analysed.</p>
+                {% if similarity_report.pairs %}
+                    <p><strong>⚠️ Suspicious Pairs (≥{{ similarity_report.threshold }} similarity):</strong></p>
+                    <ul>
+                        {% for pair in similarity_report.pairs %}
+                             <li>
+                                <strong>{{ pair.username_a }}</strong> 
+                                (<a href="/submissions/{{ pair.submission_a }}">{{ pair.submission_a[:8] }}</a>) 
+                                ↔ 
+                                <strong>{{ pair.username_b }}</strong> 
+                                (<a href="/submissions/{{ pair.submission_b }}">{{ pair.submission_b[:8] }}</a>) 
+                                – Similarity: {{ pair.similarity }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No suspicious pairs found.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p style="color: #888;">No similarity report yet. Click the button above to run the check.</p>
+        {% endif %}
+
         <div style="margin-top:20px;">
             <a href="/problems/{{ problem.id }}/edit" class="btn btn-warning">✏️ Edit</a>
             <form method="post" action="/problems/{{ problem.id }}/delete" style="display:inline;">

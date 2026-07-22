@@ -7,6 +7,7 @@ import os
 import asyncio
 import json
 from datetime import datetime
+import httpx
 
 # Import routers
 from app.routers import auth, problems, submissions, logs, admin, similarity, users
@@ -528,6 +529,99 @@ async def admin_user_update(request: Request, user_id: str):
     audit_repo.create(audit_log)
     
     return RedirectResponse(url="/admin/users?success=updated", status_code=302)
+
+# Similarity (Frontend)
+@app.post("/problems/{problem_id}/similarity-check")
+async def similarity_check_post(request: Request, problem_id: str):
+    user = await get_current_user_frontend(request)
+    if not user or user.role not in ["teacher", "admin"]:
+        return RedirectResponse(url="/", status_code=302)
+    
+    from app.services.similarity_service import find_similar_pairs
+    from app.repositories.submission_repository import SubmissionRepository
+    
+    # Get all finished submissions for this problem
+    sub_repo = SubmissionRepository()
+    all_subs = sub_repo.get_by_problem_id(problem_id)
+    
+    submissions = []
+    for sub in all_subs:
+        if sub.status == "finished" and sub.source_code:
+            submissions.append({
+                "id": sub.id,
+                "user_id": sub.user_id,
+                "source_code": sub.source_code,
+            })
+    
+    if len(submissions) < 2:
+        # Redirect, but show a message
+        return RedirectResponse(
+            url=f"/problems/{problem_id}/similarity-reports?error=not_enough",
+            status_code=302
+        )
+    
+    # Run similarity detection
+    pairs = find_similar_pairs(submissions, threshold=0.8)
+    
+    # Save report
+    report = {
+        "problem_id": problem_id,
+        "total_submissions": len(submissions),
+        "pairs": pairs,
+        "threshold": 0.8,
+    }
+    similarity_repo.save_report(problem_id, report)
+    
+    # Redirect to the report page
+    return RedirectResponse(
+        url=f"/problems/{problem_id}/similarity-reports?success=checked",
+        status_code=302
+    )
+
+
+@app.get("/problems/{problem_id}/similarity-reports")
+async def similarity_report_page(request: Request, problem_id: str):
+    user = await get_current_user_frontend(request)
+    if not user or user.role not in ["teacher", "admin"]:
+        return RedirectResponse(url="/", status_code=302)
+    
+    problem = problem_repo.get_by_id(problem_id)
+    if not problem:
+        raise HTTPException(status_code=404, detail="Problem not found")
+    
+    report = similarity_repo.get_report(problem_id)
+    
+    # Enrich report with usernames
+    enriched_pairs = []
+    if report and report.get("pairs"):
+        for pair in report["pairs"]:
+            sub_a = submission_repo.get_by_id(pair["submission_a"])
+            sub_b = submission_repo.get_by_id(pair["submission_b"])
+            
+            user_a = user_repo.get_by_id(sub_a.user_id) if sub_a else None
+            user_b = user_repo.get_by_id(sub_b.user_id) if sub_b else None
+            
+            enriched_pairs.append({
+                "submission_a": pair["submission_a"],
+                "submission_b": pair["submission_b"],
+                "username_a": user_a.username if user_a else "Unknown",
+                "username_b": user_b.username if user_b else "Unknown",
+                "similarity": pair["similarity"],
+                "method": pair.get("method", "ast"),
+            })
+        report["pairs"] = enriched_pairs
+    
+    # Render template
+    template = jinja_env.get_template("problem_detail.html")
+    content = template.render(
+        request=request,
+        user=user,
+        problem=problem,
+        is_teacher=True,
+        similarity_report=report
+    )
+    return HTMLResponse(content)
+
 
 # Health Check
 @app.get("/ping")
