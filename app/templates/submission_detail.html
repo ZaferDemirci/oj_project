@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Submission {{ submission.id }}{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>Submission {{ submission.id }}</h3>
+    <p><strong>Submitter:</strong> {{ submitter_username }}</p>
+    <p><strong>Problem:</strong> {{ submission.problem_id }}</p>
+    <p><strong>Status:</strong> {{ submission.status }}</p>
+    <p><strong>Result:</strong> {{ submission.result or '-' }}</p>
+    <p><strong>Score:</strong> {{ submission.score }}</p>
+    <p><strong>Total Time:</strong> {{ submission.total_time or 'N/A' }}</p>
+    <p><strong>Submitted:</strong> {{ submission.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+
+    {# --- Display the submitted source code --- #}
+    <hr>
+    <h4>Source Code</h4>
+    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto;">{{ submission.source_code }}</pre>
+    
+    {% if is_teacher and submission.status in ['finished', 'failed'] %}
+        <form method="post" action="/submissions/{{ submission.id }}/rejudge" style="display:inline;">
+            <button type="submit" class="btn btn-warning">🔄 Rejudge</button>
+        </form>
+    {% endif %}
+
+    {% if logs %}
+        <hr>
+        <h4>Judge Logs</h4>
+        <p><strong>Final Result:</strong> {{ logs.result }}</p>
+        <p><strong>Score:</strong> {{ logs.score }}</p>
+        <ul>
+            {% for case in logs.cases %}
+                <li>
+                    <strong>{{ case.case_id }}</strong>: {{ case.result }} ({{ case.score }}pts) 
+                    {% if case.time_used %}
+                        {{ case.time_used }}s
+                    {% endif %}
+                    
+                    {# --- Show input and expected output for teachers ONLY --- #}
+                    {% if is_teacher %}
+                        {% if case.input_data %}
+                            <br><strong>Input:</strong>
+                            <pre>{{ case.input_data }}</pre>
+                        {% endif %}
+                        {% if case.expected_output %}
+                            <br><strong>Expected Output:</strong>
+                            <pre>{{ case.expected_output }}</pre>
+                        {% endif %}
+                    {% endif %}
+                
+                    {# --- Show actual stdout --- #}
+                    {% if case.stdout %}
+                        <br><strong>Your Output:</strong>
+                        <pre>{{ case.stdout }}</pre>
+                    {% endif %}
+                
+                    {# --- Show stderr (if any) --- #}
+                    {% if case.stderr %}
+                        <br><strong>stderr:</strong>
+                        <pre>{{ case.stderr }}</pre>
+                    {% endif %}
+                </li>
+            {% else %}
+                <li>No test case logs available.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

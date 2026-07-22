@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ problem.id }} - {{ problem.title }}{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>{{ problem.id }} - {{ problem.title }}</h3>
+    <p><strong>Description:</strong> {{ problem.description }}</p>
+    <p><strong>Input:</strong> {{ problem.input_description }}</p>
+    <p><strong>Output:</strong> {{ problem.output_description }}</p>
+    <p><strong>Constraints:</strong> {{ problem.constraints or 'None' }}</p>
+    <p><strong>Time:</strong> {{ problem.time_limit }}s | <strong>Memory:</strong> {{ problem.memory_limit }}MB</p>
+    
+    <h4>Samples:</h4>
+    {% for sample in problem.samples %}
+        <div class="test-case">
+            <strong>Input:</strong> {{ sample.input }}<br>
+            <strong>Output:</strong> {{ sample.output }}
+        </div>
+    {% endfor %}
+
+    {% if is_teacher %}
+        <hr>
+        <h4>Test Cases (Teacher View)</h4>
+        {% for tc in problem.test_cases %}
+            <div class="test-case">
+                <strong>{{ tc.case_id }}</strong> ({% if tc.is_hidden %}🔒 Hidden{% else %}👁️ Public{% endif %}) | Score: {{ tc.score }}
+                <br><strong>Input:</strong> {{ tc.input }}
+                <br><strong>Output:</strong> {{ tc.output }}
+            </div>
+        {% endfor %}
+        
+        <div style="margin-top:20px;">
+            <a href="/problems/{{ problem.id }}/edit" class="btn btn-warning">✏️ Edit</a>
+            <form method="post" action="/problems/{{ problem.id }}/delete" style="display:inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this problem?')">🗑️ Delete</button>
+            </form>
+        </div>
+    {% endif %}
+
+    <hr>
+    <h4>Submit Solution</h4>
+    <form method="post" action="/problems/{{ problem.id }}/submit">
+        <textarea name="source_code" placeholder="Paste your Python code here..." required style="font-family: monospace;"></textarea>
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    {% if request.query_params.get('error') == 'empty_code' %}
+        <p style="color:red;">Code cannot be empty.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OJ System{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <a href="/" style="color: white; text-decoration: none;">📚 OJ System</a>
+            </div>
+            <div class="navbar-user">
+                {% if user %}
+                    <span>{{ user.username }} ({{ user.role }})</span>
+                    {% if user.role == 'admin' %}
+                        <a href="/admin/users" class="btn" style="background:#34495e; color:white; padding:5px 12px; border-radius:20px; text-decoration:none; font-size:0.9rem;">👥 Users</a>
+                        <a href="/admin/backups" class="btn" style="background:#34495e; color:white; padding:5px 12px; border-radius:20px; text-decoration:none; font-size:0.9rem;">💾 Backups</a>
+                    {% endif %}
+                    <form method="post" action="/logout" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
+                {% else %}
+                    <span>Guest</span>
+                {% endif %}
+            </div>
+        </nav>
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

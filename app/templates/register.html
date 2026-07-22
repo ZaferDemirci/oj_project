@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="auth-box">
+    <h2>Register</h2>
+    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+    <form method="post" action="/register">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password (min 8 chars)" required>
+        <button type="submit" class="btn btn-success">Register</button>
+    </form>
+    <div class="auth-toggle">Already have an account? <a href="/login">Login</a></div>
+</div>
+{% endblock %}

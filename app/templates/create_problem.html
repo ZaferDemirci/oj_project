@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Edit Problem{% else %}Create Problem{% endif %}{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>{% if is_edit %}Edit Problem{% else %}Create Problem{% endif %}</h3>
+    {% if request.query_params.get('error') == 'invalid' %}
+        <p style="color:red;">Invalid data. Check JSON formatting.</p>
+    {% endif %}
+    <form method="post" action="{% if is_edit %}/problems/{{ problem.id }}/edit{% else %}/problems/create{% endif %}">
+        <input type="text" name="id" placeholder="Problem ID (e.g. P1001)" required
+               {% if is_edit %}value="{{ problem.id }}" disabled{% else %}value=""{% endif %}>
+        {% if is_edit %}<input type="hidden" name="id" value="{{ problem.id }}">{% endif %}
+        
+        <input type="text" name="title" placeholder="Title" required
+               {% if is_edit %}value="{{ problem.title }}"{% endif %}>
+        
+        <textarea name="description" placeholder="Description" required>{% if is_edit %}{{ problem.description }}{% endif %}</textarea>
+        <textarea name="input_description" placeholder="Input Description" required>{% if is_edit %}{{ problem.input_description }}{% endif %}</textarea>
+        <textarea name="output_description" placeholder="Output Description" required>{% if is_edit %}{{ problem.output_description }}{% endif %}</textarea>
+        <textarea name="samples" placeholder='Samples (JSON array) e.g. [{"input":"1 2\\n","output":"3\\n"}]' required>{% if is_edit %}{{ samples_json }}{% endif %}</textarea>
+        <input type="text" name="constraints" placeholder="Constraints"
+               {% if is_edit %}value="{{ problem.constraints }}"{% endif %}>
+        <input type="number" step="0.1" name="time_limit" placeholder="Time Limit (s)" required
+               {% if is_edit %}value="{{ problem.time_limit }}"{% endif %}>
+        <input type="number" name="memory_limit" placeholder="Memory Limit (MB)" required
+               {% if is_edit %}value="{{ problem.memory_limit }}"{% endif %}>
+        <select name="difficulty">
+            <option value="easy" {% if is_edit and problem.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+            <option value="medium" {% if is_edit and problem.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+            <option value="hard" {% if is_edit and problem.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+        </select>
+        <input type="text" name="tags" placeholder="Tags (comma separated)"
+               {% if is_edit %}value="{{ problem.tags|join(', ') }}"{% endif %}>
+        <textarea name="test_cases" placeholder='Test Cases (JSON array) e.g. [{"case_id":"c1","input":"1 2\\n","output":"3\\n","score":50,"is_hidden":false}]' required>{% if is_edit %}{{ test_cases_json }}{% endif %}</textarea>
+        
+        <button type="submit" class="btn btn-success">{% if is_edit %}Update{% else %}Create{% endif %}</button>
+        <a href="/" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

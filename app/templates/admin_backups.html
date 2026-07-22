@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Admin Backups{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>💾 Backups</h3>
+    <form method="post" action="/admin/backups/create" style="margin-bottom:20px;">
+        <button type="submit" class="btn btn-primary">Create Backup</button>
+    </form>
+    <ul>
+        {% for b in backups %}
+            <li>
+                <strong>{{ b.backup_id }}</strong> ({{ b.created_at }}) 
+                - Files: {{ b.files|join(', ') }}
+                <form method="post" action="/admin/backups/{{ b.backup_id }}/restore" style="display:inline;">
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Restore this backup? This will overwrite current data.')">Restore</button>
+                </form>
+            </li>
+        {% else %}
+            <li>No backups found.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

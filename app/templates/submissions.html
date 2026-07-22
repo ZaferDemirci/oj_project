@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Submissions{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>📊 Submissions</h3>
+    <div>
+        {% for submission, submitter in submissions %}
+            <div class="submission-item">
+                <a href="/submissions/{{ submission.id }}">
+                    <strong>{{ submitter }}</strong> | 
+                    {{ submission.problem_id }} | {{ submission.status }} | {{ submission.result or '-' }} | {{ submission.score }}pts
+                </a>
+                <span>{{ submission.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            </div>
+        {% else %}
+            <p>No submissions yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Edit User – {{ target_user.username }}{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>✏️ Edit User: {{ target_user.username }}</h3>
+    {% if request.query_params.get('error') == 'self_disable' %}
+        <p style="color:red;">You cannot disable your own account.</p>
+    {% endif %}
+    {% if request.query_params.get('error') == 'invalid_role' %}
+        <p style="color:red;">Invalid role selected.</p>
+    {% endif %}
+    {% if request.query_params.get('error') == 'self_modify' %}
+    <p style="color:red;">You cannot modify your own account.</p>
+    {% endif %}
+    <form method="post" action="/admin/users/{{ target_user.id }}">
+        <div>
+            <label><strong>Username:</strong> {{ target_user.username }}</label>
+        </div>
+        <div style="margin-top:12px;">
+            <label for="role">Role:</label>
+            <select name="role" id="role">
+                <option value="student" {% if target_user.role == 'student' %}selected{% endif %}>Student</option>
+                <option value="teacher" {% if target_user.role == 'teacher' %}selected{% endif %}>Teacher</option>
+                <option value="admin" {% if target_user.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        <div style="margin-top:12px;">
+            <label for="is_active">Active:</label>
+            <select name="is_active" id="is_active">
+                <option value="true" {% if target_user.is_active %}selected{% endif %}>Yes</option>
+                <option value="false" {% if not target_user.is_active %}selected{% endif %}>No</option>
+            </select>
+        </div>
+        <div style="margin-top:20px;">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="/admin/users" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

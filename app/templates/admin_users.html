@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Admin – Users{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>👥 User Management</h3>
+    {% if request.query_params.get('success') == 'updated' %}
+        <p style="color:green;">User updated successfully.</p>
+    {% endif %}
+    {% if request.query_params.get('error') == 'notfound' %}
+        <p style="color:red;">User not found.</p>
+    {% endif %}
+    {% if request.query_params.get('error') == 'self_modify' %}
+        <p style="color:red;">You cannot modify your own account.</p>
+    {% endif %}
+    <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+        <thead>
+            <tr style="background:#f0f0f0; text-align:left;">
+                <th style="padding:8px;">Username</th>
+                <th style="padding:8px;">Role</th>
+                <th style="padding:8px;">Active</th>
+                <th style="padding:8px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for u in users %}
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px;">{{ u.username }}</td>
+                <td style="padding:8px;">{{ u.role }}</td>
+                <td style="padding:8px;">{% if u.is_active %}✅{% else %}❌{% endif %}</td>
+                <td style="padding:8px;">
+                    {% if u.id != user.id %}
+                        <a href="/admin/users/{{ u.id }}" class="btn btn-secondary">Edit</a>
+                    {% else %}
+                        <span style="color:#999;">(you)</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4" style="padding:8px;">No users found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p style="margin-top:10px;"><a href="/" class="btn btn-secondary">← Back to Home</a></p>
+</div>
+{% endblock %}

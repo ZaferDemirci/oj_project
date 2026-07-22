@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>📋 Problems
+        {% if user.role in ['teacher', 'admin'] %}
+            <a href="/problems/create" class="btn btn-success">+ New Problem</a>
+        {% endif %}
+    </h3>
+    <div>
+        {% for p in problems %}
+            <div class="problem-item">
+                <a href="/problems/{{ p.id }}" class="title">{{ p.id }} - {{ p.title }}</a>
+                <span class="meta">{{ p.difficulty }} | {{ p.time_limit }}s</span>
+            </div>
+        {% else %}
+            <p>No problems available.</p>
+        {% endfor %}
+    </div>
+</div>
+<div class="card">
+    <h3>📊 <a href="/submissions">Submissions</a></h3>
+</div>
+{% endblock %}
