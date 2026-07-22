@@ -10,9 +10,7 @@ __pycache__/
 .pytest_cache/
 
 # Data files
-data/*.json
-data/backups/
-data/safety_*/
+data/
 
 # Temporary judge directories
 temp/
