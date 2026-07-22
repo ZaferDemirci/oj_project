@@ -26,6 +26,10 @@ from app.models.audit import AuditLog
 from app.models.problem import Problem
 from app.utils.sanitize import sanitize_for_student, sanitize_for_teacher
 
+# env
+from dotenv import load_dotenv
+load_dotenv()
+
 app = FastAPI()
 
 # Session Middleware
