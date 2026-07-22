@@ -185,7 +185,7 @@ Static files (CSS, etc.) are located in `app/static/`.
 * Only **Python** code is supported for submissions.
 * Memory limits are stored but **not enforced** (only time limits are enforced).
 * The judge runs in a **separate subprocess** but does not use Docker or advanced isolation.
-* The similarity detection uses AST based normalisation and is **not** a plagiarism‑proof tool, it only provides a suspicion score.
+* The similarity detection uses AST (Abstract Syntax Trees) based normalisation and is **not** a plagiarism‑proof tool, it only provides a suspicion score.
 
 ---
 
