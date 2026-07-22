@@ -52,6 +52,41 @@ This project was developed as a university assignment and supports:
 
 All settings are managed via environment variables (or a `.env` file).
 
+* PowerShell
+
+    ```powershell
+    # Temporary variable (current session only)
+    $env:MY_VAR = "some_value"
+
+    # Remove with:
+    Remove-Item Env:MY_VAR`
+    # or
+    $env:MY_VAR = $null
+
+
+    # Permanent variable for current user
+    [Environment]::SetEnvironmentVariable("MY_VAR", "some_value", "User")
+
+    # Permanent variable for machine (all users)
+    [Environment]::SetEnvironmentVariable("MY_VAR", "some_value", "Machine")
+    
+    # Remove with:
+    [Environment]::SetEnvironmentVariable("MY_VAR", $null, "User")
+    # or "Machine" for system-wide removal
+    ```
+
+* Bash
+  
+    ```bash
+    # Temporary variable (current session only)
+    export MY_VAR="some_value"
+
+    # Remove with:
+    unset MY_VAR
+    ```
+
+  * Add the export line to your shell startup file (e.g., ~/.bashrc, ~/.profile, ~/.bash_profile) and for machine use /etc/environment or /etc/profile (requires root).
+
 Create a `.env` file in the project root (optional) with:
 
 ```env
